@@ -20,9 +20,9 @@ from upi import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/groups', views.GroupList.as_view()),
+    path('api/groups/', views.GroupList.as_view()),
     path('api/groups/<int:pk>', views.GroupDetail.as_view()),
-    path('api/contacts', views.ContactList.as_view()),
+    path('api/contacts/', views.ContactList.as_view()),
     path('api/contacts/<int:pk>', views.ContactDetail.as_view()),
     path('api/subscription', views.SubscriptionList.as_view()),
     path('api/subscription/<int:pk>', views.SubscriptionDetail.as_view()),

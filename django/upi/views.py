@@ -35,6 +35,9 @@ class ContactDetail(generics.RetrieveUpdateDestroyAPIView):
 class SubscriptionList(generics.ListCreateAPIView):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
+    # def perform_create(self, serializer):
+    #     # create a payment entry with payment status as pending
+    #     print("Hey I am called")
 
 class SubscriptionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Subscription.objects.all()
