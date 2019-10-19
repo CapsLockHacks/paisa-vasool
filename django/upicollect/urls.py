@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from upi import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/groups', views.GroupsList.as_view()),
+    path('api/groups/<int:pk>', views.GroupDetail.as_view()),
 ]
