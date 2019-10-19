@@ -51,11 +51,6 @@ class SyncSMS(APIView):
     """
 
     def post(self, request, format=None):
-        # serializer = SnippetSerializer()
-        # if serializer.is_valid():
-        #     serializer.save()
-        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         list_of_sms = request.data
 
         for sms in list_of_sms:
@@ -92,5 +87,77 @@ class SyncSMS(APIView):
                 print(e)
                 return Response(status=400, data="error while saving sub")
 
-
         return Response(status=200)
+
+
+class Splits(APIView):
+    """
+    Creates multiple subscription entries for each group/contact 
+    amount split.
+    {
+        "splits": [
+            {
+                "amount":"xyz",
+                "contact": "abc",
+            },
+            ...
+        ],
+        "subscription": "netflix",
+        "frequency": 8,
+        "description": "hey this group is for netflix
+    }
+
+    """
+    def get(self, request, format=None):
+        subscriptions = Subscription.objects.all()
+        data = []
+        for sub in subscriptions:
+            paid, unpaid = sub.get_settlement_status()
+            if unpaid:
+                settlement_status = True
+            subscription_id = sub.id
+            amount = sub.amount
+            name = sub.name
+            created_date = sub.created_date
+            frequency = sub.frequency
+            contacts = []
+            groups = sub.get_all_groups()
+            for i in groups:
+                contacts.append({"name":i.contact.name,"amount":i.contact.amount,"settled": is_contact_settled(i.contact)})
+            data.append({
+                "settlement_status":settlement_status,
+                "amount":amount,
+                "name":name,
+                "created_date":created_date,
+                "frequency":frequency,
+                "contacts":contacts
+            })
+        return Reponse(status=200, data=data)
+
+    def post(self, request, format=None):
+        data = request.data
+        # check if group exists otherwise create a group
+        group, created = Group.objects.get_or_create(
+            name=data.get('subscription'),
+            description=data.get('description')
+        )
+        frequency = data.get('frequency')
+        # for each entry, create a new subscription entry
+        for i in data:
+            contact_name = i.get('contact')
+            amount = i.get('amount')
+            # TODO: @rhnvrm: apply the amount hack here
+            contact = Contact.objects.get_instance(contact_name)
+            if not contact:
+                return Response(status=500, data=f"Invalid contact name {contact_name}")
+            try:
+                subscription = Subscription.objects.create(
+                    group=group,
+                    contact=contact,
+                    amount=amount,
+                    frequency=frequency
+                )
+            except Exception as e:
+                print(f"Error while saving subscription {e}")
+                return Response(status=500, data="Oops, this didn't go as expected")
+

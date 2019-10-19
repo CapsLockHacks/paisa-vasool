@@ -24,9 +24,11 @@ urlpatterns = [
     path('api/groups/<int:pk>', views.GroupDetail.as_view()),
     path('api/contacts/', views.ContactList.as_view()),
     path('api/contacts/<int:pk>', views.ContactDetail.as_view()),
-    path('api/subscription', views.SubscriptionList.as_view()),
-    path('api/subscription/<int:pk>', views.SubscriptionDetail.as_view()),
-    path('api/payment', views.PaymentList.as_view()),
-    path('api/payment/<int:pk>', views.PaymentDetail.as_view()),
-    path('api/sync', views.SyncSMS.as_view())
+    path('api/subscriptions/', views.SubscriptionList.as_view()),
+    path('api/subscriptions/<int:pk>', views.SubscriptionDetail.as_view()),
+    path('api/splits/create/', views.Splits.as_view()),
+    path('api/splits/fetch/', views.Splits.as_view()),
+    path('api/payments/', views.PaymentList.as_view()),
+    path('api/payments/<int:pk>', views.PaymentDetail.as_view()),
+    path('api/sync/', views.SyncSMS.as_view()),
 ]
