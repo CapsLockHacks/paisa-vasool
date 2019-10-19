@@ -16,6 +16,7 @@ class Contact(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
     phone = models.CharField(max_length=12, unique=True)
+    email = models.CharField(max_length=100, null=True)
     created_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -29,7 +30,7 @@ class Payment(models.Model):
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     created_date = models.DateTimeField(default=timezone.now)
-    amount = models.DecimalField(max_digits=5, decimal_places=2)
+    amount = models.DecimalField(max_digits=18, decimal_places=6)
 
     def __str__(self):
         return self.status
@@ -38,7 +39,7 @@ class Payment(models.Model):
 class Subscription(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
-    amount = models.DecimalField(max_digits=5, decimal_places=2,unique=True)
+    amount = models.DecimalField(max_digits=18, decimal_places=6, unique=True)
     payment_date = models.DateTimeField(default=timezone.now)
     last_payment_id = models.ForeignKey(Payment, on_delete=models.CASCADE, null=True)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)

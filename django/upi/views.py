@@ -1,6 +1,7 @@
 import json, re
 from upi.models import Group, Contact, Subscription, Payment
 from django.http import Http404
+from decimal import Decimal
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -79,8 +80,8 @@ class SyncSMS(APIView):
                     group = sub.group,
                     amount = money
                 )
-            except:
-                print("unable to create payment")
+            except Exception as e:
+                print(f"unable to create payment {e}")
                 return Response(status=400) 
 
             sub.last_payment_id = payment
