@@ -1,4 +1,4 @@
-import json
+import json, re
 from upi.models import Group, Contact, Subscription, Payment
 from django.http import Http404
 from rest_framework.views import APIView
@@ -58,6 +58,7 @@ class SyncSMS(APIView):
         list_of_sms = request.data
 
         for sms in list_of_sms:
-            print(sms)
+           result = re.search(r'(\d+\.\d+)', sms)
+           money = result.group()
         
         return Response(status=200)
