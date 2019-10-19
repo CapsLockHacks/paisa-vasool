@@ -32,7 +32,7 @@ class Payment(models.Model):
     amount = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
-        return self.id
+        return self.status
 
 # Subscription represents each contact and group details
 class Subscription(models.Model):
