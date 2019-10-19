@@ -1,3 +1,4 @@
+import json
 from upi.models import Group, Contact, Subscription, Payment
 from django.http import Http404
 from rest_framework.views import APIView
@@ -42,3 +43,21 @@ class SubscriptionList(generics.ListCreateAPIView):
 class SubscriptionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
+
+class SyncSMS(APIView):
+    """
+    Sync SMS with mobile app.
+    """
+
+    def post(self, request, format=None):
+        # serializer = SnippetSerializer()
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        list_of_sms = request.data
+
+        for sms in list_of_sms:
+            print(sms)
+        
+        return Response(status=200)
