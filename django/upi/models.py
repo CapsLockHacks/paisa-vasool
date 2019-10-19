@@ -38,7 +38,7 @@ class Payment(models.Model):
 class Subscription(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
-    amount = models.DecimalField(max_digits=5, decimal_places=2)
+    amount = models.DecimalField(max_digits=5, decimal_places=2,unique=True)
     payment_date = models.DateTimeField(default=timezone.now)
     last_payment_id = models.ForeignKey(Payment, on_delete=models.CASCADE, null=True)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
