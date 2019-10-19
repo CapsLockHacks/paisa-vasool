@@ -58,7 +58,30 @@ class SyncSMS(APIView):
         list_of_sms = request.data
 
         for sms in list_of_sms:
-           result = re.search(r'(\d+\.\d+)', sms)
-           money = result.group()
+            try:
+                result = re.search(r'(\d+\.\d+)', sms)
+                money = result.group()
+            except:
+                print("unable to find money")
+                return Response(status=400)
+            try:
+                sub = Subscription.objects.get(amount=money)
+            except Subscription.DoesNotExist:
+                print("unable to find sub")
+                return Response(status=400, data="amount not found")
+            except Exception as e:
+                print(e)
+                return Response(status=500, data="something went wrong while fetching sub")
+            try:
+                Payment.objects.create(
+                    status='complete',
+                    contact = sub.contact,
+                    group = sub.group,
+                    amount = money
+                )
+            except:
+                print("unable to create payment")
+                return Response(status=400) 
         
+
         return Response(status=200)
