@@ -73,7 +73,7 @@ class SyncSMS(APIView):
                 print(e)
                 return Response(status=500, data="something went wrong while fetching sub")
             try:
-                Payment.objects.create(
+                payment = Payment.objects.create(
                     status='complete',
                     contact = sub.contact,
                     group = sub.group,
@@ -82,6 +82,14 @@ class SyncSMS(APIView):
             except:
                 print("unable to create payment")
                 return Response(status=400) 
-        
+
+            sub.last_payment_id = payment
+
+            try:
+                sub.save()
+            except Exception as e:
+                print(e)
+                return Response(status=400, data="error while saving sub")
+
 
         return Response(status=200)
