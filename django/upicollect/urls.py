@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from upi import views
 
@@ -28,5 +28,6 @@ urlpatterns = [
     path('api/subscription/<int:pk>', views.SubscriptionDetail.as_view()),
     path('api/payment', views.PaymentList.as_view()),
     path('api/payment/<int:pk>', views.PaymentDetail.as_view()),
-    path('api/sync', views.SyncSMS.as_view())
+    path('api/sync', views.SyncSMS.as_view()),
+    path('django-rq/', include('django_rq.urls'))
 ]
