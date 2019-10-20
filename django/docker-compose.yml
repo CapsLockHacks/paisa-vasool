@@ -15,7 +15,7 @@ services:
   web:
     build: .
     # command: python manage.py runserver 0.0.0.0:8000
-    command: gunicorn upicollect.wsgi:application --bind 0.0.0.0:8000 -w 4
+    command: gunicorn upicollect.wsgi:application --bind 0.0.0.0:8000 -w 8 --access-logfile - --error-logfile -
     volumes:
       - .:/code
     env_file:
