@@ -197,3 +197,10 @@ class Splits(APIView):
                 return Response(status=500, data="Oops, this didn't go as expected")
             django_rq.enqueue(create_and_send_url, '{0:.2f}'.format(next_amount), contact.phone, contact.email, group.name)
         return Response(status=200, data="subscription created")
+
+class Health(APIView):
+    """
+    Health check.
+    """
+    def get(self, request, format=None):
+        return Response(status=200, data="all systems up...")

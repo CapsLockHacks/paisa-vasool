@@ -31,5 +31,6 @@ urlpatterns = [
     path('api/payments/', views.PaymentList.as_view()),
     path('api/payments/<int:pk>/', views.PaymentDetail.as_view()),
     path('api/sync/', views.SyncSMS.as_view()),
+    path('api/health/', views.Health.as_view()),
     path('django-rq/', include('django_rq.urls'))
 ]
