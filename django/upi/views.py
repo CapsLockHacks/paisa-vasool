@@ -2,6 +2,7 @@ import json, re
 from upi.models import Group, Contact, Subscription, Payment
 from django.http import Http404
 from decimal import Decimal
+from upi.utils import nextAmount, get_settlement_status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -68,8 +69,8 @@ class SyncSMS(APIView):
             try:
                 sub = Subscription.objects.get(amount=money)
             except Subscription.DoesNotExist:
-                print("unable to find sub")
-                return Response(status=400, data="amount not found")
+                print(f"unable to find sub for amount: {money} in {sms}")
+                continue
             except Exception as e:
                 print(e)
                 return Response(status=500, data="something went wrong while fetching sub")
@@ -78,19 +79,88 @@ class SyncSMS(APIView):
                     status='complete',
                     contact = sub.contact,
                     group = sub.group,
-                    amount = money
+                    amount = money,
+                    cycle=sub.group.cycle
                 )
             except Exception as e:
                 print(f"unable to create payment {e}")
                 return Response(status=400) 
 
             sub.last_payment_id = payment
-
+            # reconcile for entire group (update cycle if all are paid)
+            paid, unpaid = get_settlement_status(cycle=sub.group.cycle, group=sub.group)
+            if not unpaid:
+                sub.group.cycle +=1
             try:
                 sub.save()
             except Exception as e:
                 print(e)
                 return Response(status=400, data="error while saving sub")
 
+        return Response(status=200)
 
+class Splits(APIView):
+    """
+    Creates multiple subscription entries for each group/contact 
+    amount split.
+    {
+        "splits": [
+            {
+                "amount":"xyz",
+                "contact": "abc",
+            },
+            ...
+        ],
+        "subscription": "netflix",
+        "frequency": "weekly",
+        "description": "hey this group is for netflix
+    }
+
+    """
+    def get(self, request, format=None):
+        subscriptions = Subscription.objects.all()
+        data = []
+        for sub in subscriptions:
+            subscription_id = sub.id
+            created_date = sub.created_date
+            contacts = []
+            for i in sub.get_subs_for_groups():
+                paid, unpaid = get_settlement_status(cycle=i.group.cycle, group=i.group)
+                settlement_status = len(unpaid) == 0
+                contacts.append({"name":i.contact.name, "amount":i.amount, "settled": i in paid})
+            data.append({
+                "settlement_status":settlement_status,
+                "name":sub.group.name,
+                "created_date":created_date,
+                "contacts":contacts
+            })
+        return Response(status=200, data=data)
+
+    def post(self, request, format=None):
+        data = request.data
+        # check if group exists otherwise create a group
+        group = Group.objects.create(
+            name=data.get('subscription'),
+            description = data.get('description'),
+            cycle = 0,
+            frequency = data.get('frequency')
+        )
+        # for each entry, create a new subscription entry
+        for i in data.get('splits'):
+            contact_id = i.get('contact')
+            amount = i.get('amount')
+            next_amount = nextAmount(amount)
+            try:
+                contact = Contact.objects.get(pk=contact_id)
+            except Contact.DoesNotExist:
+                return Response(status=500, data=f"Invalid contact id {contact_id}")
+            try:
+                subscription = Subscription.objects.create(
+                    group=group,
+                    contact=contact,
+                    amount=next_amount,
+                )
+            except Exception as e:
+                print(f"Error while saving subscription {e}")
+                return Response(status=500, data="Oops, this didn't go as expected")
         return Response(status=200)
