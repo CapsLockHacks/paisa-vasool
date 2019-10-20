@@ -39,18 +39,15 @@ def get_settlement_status(group, cycle):
     return paid, unpaid
 
 def createUPILink(upi_id, name, tx_note, amount):
-    headers = {
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Content-Type': 'application/json',
-        'Connection': 'keep-alive',
-        'Cache-Control': 'no-cache',
-    }
     base64_data = generateBase64UPIData(upi_id, name, tx_note, amount).decode('utf-8')
     data = {
-    '{"long_url":"https://upi.link/l?d': '{'+base64_data+'}"}'
+        "long_url": f"https://upi.link/l?d={base64_data}"
     }
-
-    response = requests.post('https://i9ag6sj2r4.execute-api.ap-south-1.amazonaws.com/default/generateShortLink', headers=headers, data=data)
-
-    return "https://upi.link/t/" + response.text
+    print(data)
+    print("sending to API.....")
+    response = requests.post('https://i9ag6sj2r4.execute-api.ap-south-1.amazonaws.com/default/generateShortLink', json=data)
+    print("receiving from API....")
+    print(f"response from upi link {response.status_code} : {response.content}")
+    if response.status_code != 200:
+        raise ValueError("Unable to create UPI Link")
+    return "https://upi.link/t/" + response.json()
