@@ -138,7 +138,7 @@ class Splits(APIView):
                     paid, unpaid = get_settlement_status(cycle=i.group.cycle, group=i.group)
                     settlement_status = len(unpaid) == 0
                     if i.last_payment_id:
-                        settlement_date = i.last_payment_id.created_date
+                        settlement_date = i.last_payment_id.created_date.strftime("%d %b,%Y")
                     else:
                         settlement_date = None
                     contacts.append({
