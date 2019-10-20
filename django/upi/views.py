@@ -112,6 +112,7 @@ class Splits(APIView):
                 "name": "<>"
                 "phone": "abc",
                 "email": "email",
+                "contact_id":<>,
             },
             
             ...
@@ -157,11 +158,20 @@ class Splits(APIView):
         )
         # for each entry, create a new subscription entry
         for i in data.get('splits'):
-            contact, created = Contact.objects.get_or_create(
-                name=i.get("name"),
-                phone=i.get("phone"),
-                email=i.get("email")
-            )
+            # if contact_id, check for existing contact
+            if i.get('contact_id'):
+                try:
+                    contact = Contact.objects.get(pk=i.get("contact_id"))
+                except Contact.DoesNotExist:
+                    return Response(status=400, data="Contact ID Is invalid")
+            else:
+                # create a contact
+                contact, created = Contact.objects.get_or_create(
+                    name=i.get("name"),
+                    phone=i.get("phone"),
+                    email=i.get("email")
+                )
+            # contact here should either be created or fetched already
             amount = i.get('amount')
             next_amount = nextAmount(amount)
             try:
