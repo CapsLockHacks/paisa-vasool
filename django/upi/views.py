@@ -137,7 +137,7 @@ class Splits(APIView):
                     settlement_status = len(unpaid) == 0
                     contacts.append({"name":i.contact.name, "amount":i.amount, "settled": i in paid})
             data.append({
-                "settlement_status":settlement_status,
+                "settled":settlement_status,
                 "name":sub.group.name,
                 "created_date":created_date,
                 "contacts":contacts
