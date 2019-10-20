@@ -5,7 +5,7 @@ from django.utils import timezone
 class Group(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
-    description = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, null=True)
     created_date = models.DateTimeField(default=timezone.now)
     frequency = models.CharField(max_length=20, null=True)
     cycle = models.IntegerField(null=False)

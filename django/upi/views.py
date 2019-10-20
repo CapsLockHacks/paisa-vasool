@@ -107,8 +107,11 @@ class Splits(APIView):
         "splits": [
             {
                 "amount":"xyz",
-                "contact": "abc",
+                "name": "<>"
+                "phone": "abc",
+                "email": "email",
             },
+            
             ...
         ],
         "subscription": "netflix",
@@ -152,13 +155,13 @@ class Splits(APIView):
         )
         # for each entry, create a new subscription entry
         for i in data.get('splits'):
-            contact_id = i.get('contact')
+            contact, created = Contact.objects.get_or_create(
+                name=i.get("name"),
+                phone=i.get("phone"),
+                email=i.get("email")
+            )
             amount = i.get('amount')
             next_amount = nextAmount(amount)
-            try:
-                contact = Contact.objects.get(pk=contact_id)
-            except Contact.DoesNotExist:
-                return Response(status=500, data=f"Invalid contact id {contact_id}")
             try:
                 subscription = Subscription.objects.create(
                     group=group,
@@ -168,4 +171,4 @@ class Splits(APIView):
             except Exception as e:
                 print(f"Error while saving subscription {e}")
                 return Response(status=500, data="Oops, this didn't go as expected")
-        return Response(status=200)
+        return Response(status=200, data="subscription created")
