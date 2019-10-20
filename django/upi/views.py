@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework import generics
 from upi.serializers import GroupSerializer, ContactSerializer,PaymentSerializer, SubscriptionSerializer
 from upi.jobs import create_and_send_url
+import django_rq
 
 class GroupList(generics.ListCreateAPIView):
     queryset = Group.objects.all()
@@ -172,6 +173,5 @@ class Splits(APIView):
             except Exception as e:
                 print(f"Error while saving subscription {e}")
                 return Response(status=500, data="Oops, this didn't go as expected")
-
-            create_and_send_url('{0:.2f}'.format(next_amount), contact.phone, contact.email, group.name).delay()
+            django_rq.enqueue(create_and_send_url, '{0:.2f}'.format(next_amount), contact.phone, contact.email, group.name)
         return Response(status=200, data="subscription created")

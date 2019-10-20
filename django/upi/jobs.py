@@ -4,6 +4,7 @@ import urllib.parse
 from os import getenv
 import requests
 from upi.utils import createUPILink
+import django_rq
 
 ADMIN_UPI_ID = "vivekr.dev@okhdfcbank"
 ADMIN_NAME = "Vivek R"
@@ -35,6 +36,6 @@ def send_email(to_email, subject, text):
 def create_and_send_url(amount, phone_number, email_id, tx_note):
     upilink = createUPILink(ADMIN_UPI_ID, ADMIN_NAME, tx_note, amount)
     text_data = f"Hey, {ADMIN_NAME} has requested Rs.{amount}/- using {APP_NAME}. Goto {upilink} and complete the payment."
-    send_sms(phone_number, SMS_SENDER_NAME, text_data).delay()
+    django_rq.enqueue(send_sms, phone_number, SMS_SENDER_NAME, text_data)
     if email_id != "":
-        send_email(email_id, f"{APP_NAME} Collect Request", text_data).delay()
+        django_rq.enqueue(send_email(email_id, f"{APP_NAME} Collect Request", text_data)
