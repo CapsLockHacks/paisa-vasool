@@ -46,13 +46,11 @@ def createUPILink(upi_id, name, tx_note, amount):
         'Connection': 'keep-alive',
         'Cache-Control': 'no-cache',
     }
-
-    base64_data = generateBase64UPIData(upi_id, name, tx_note, amount)
-
+    base64_data = generateBase64UPIData(upi_id, name, tx_note, amount).decode('utf-8')
     data = {
     '{"long_url":"https://upi.link/l?d': '{'+base64_data+'}"}'
     }
 
     response = requests.post('https://i9ag6sj2r4.execute-api.ap-south-1.amazonaws.com/default/generateShortLink', headers=headers, data=data)
 
-    return "https://upi.link/t/" + response.text()
+    return "https://upi.link/t/" + response.text

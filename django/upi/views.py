@@ -139,7 +139,7 @@ class Splits(APIView):
             data.append({
                 "settled":settlement_status,
                 "name":sub.group.name,
-                "created_date":created_date,
+                "created_date":created_date.strftime("%d %b,%Y"),
                 "contacts":contacts
             })
         return Response(status=200, data=data)
@@ -173,5 +173,5 @@ class Splits(APIView):
                 print(f"Error while saving subscription {e}")
                 return Response(status=500, data="Oops, this didn't go as expected")
 
-            create_and_send_url(next_amount, contact.phone, contact.email, group.name).delay()
+            create_and_send_url('{0:.2f}'.format(next_amount), contact.phone, contact.email, group.name).delay()
         return Response(status=200, data="subscription created")
