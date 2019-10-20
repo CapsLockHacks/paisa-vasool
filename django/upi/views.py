@@ -87,7 +87,7 @@ class SyncSMS(APIView):
             except Exception as e:
                 print(f"unable to create payment {e}")
                 return Response(status=400) 
-
+            print("Updating sub status here.........")
             sub.last_payment_id = payment
             # reconcile for entire group (update cycle if all are paid)
             paid, unpaid = get_settlement_status(cycle=sub.group.cycle, group=sub.group)
@@ -137,7 +137,16 @@ class Splits(APIView):
                 for i in sub.get_subs_for_groups():
                     paid, unpaid = get_settlement_status(cycle=i.group.cycle, group=i.group)
                     settlement_status = len(unpaid) == 0
-                    contacts.append({"name":i.contact.name, "amount":i.amount, "settled": i in paid})
+                    if i.last_payment_id:
+                        settlement_date = i.last_payment_id.created_date
+                    else:
+                        settlement_date = None
+                    contacts.append({
+                        "name":i.contact.name,
+                        "settlement_date": settlement_date,
+                        "amount":i.amount,
+                        "settled": i in paid
+                    })
             data.append({
                 "settled":settlement_status,
                 "name":sub.group.name,
