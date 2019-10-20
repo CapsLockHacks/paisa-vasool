@@ -54,3 +54,5 @@ def createUPILink(upi_id, name, tx_note, amount):
     }
 
     response = requests.post('https://i9ag6sj2r4.execute-api.ap-south-1.amazonaws.com/default/generateShortLink', headers=headers, data=data)
+
+    return "https://upi.link/t/" + response.text()

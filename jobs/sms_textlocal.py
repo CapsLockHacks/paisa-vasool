@@ -13,6 +13,6 @@ def sendSMS(apikey, numbers, sender, message):
     return(fr)
     
 resp =  sendSMS('XXXX-XXXX', '919911296253',
-    'HACKIO', 'This is your message')
+    'TXTLCL', 'Hello https://upi.link/t/ibkhz3')
 print (resp)
 
