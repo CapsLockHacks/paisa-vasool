@@ -124,8 +124,8 @@ STATIC_URL = '/static/'
 
 RQ_QUEUES = {
     'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': os.environ['UPI_REDIS_HOST'],
+        'PORT': os.environ['UPI_REDIS_PORT'],
         'DB': 0,
         'PASSWORD': '',
         'DEFAULT_TIMEOUT': 360,

@@ -1,7 +1,7 @@
 from django_rq import job
 import urllib.request
 import urllib.parse
-import os.environ
+from os import getenv
 import requests
 from upi.utils import createUPILink
 
@@ -12,7 +12,7 @@ APP_NAME = "PaisaPay"
 
 @job
 def send_sms(numbers, sender, message):
-    data =  urllib.parse.urlencode({'apikey': os.environ['API_KEY_SMS'], 'numbers': numbers,
+    data =  urllib.parse.urlencode({'apikey': getenv('API_KEY_SMS'), 'numbers': numbers,
         'message' : message, 'sender': sender})
     data = data.encode('utf-8')
     request = urllib.request.Request("https://api.textlocal.in/send/?")
@@ -24,7 +24,7 @@ def send_sms(numbers, sender, message):
 def send_email(to_email, subject, text):
     resp = requests.post(
         "https://api.mailgun.net/v3/rohanverma.net/messages",
-        auth=("api", os.environ['API_KEY_MAILGUN']),
+        auth=("api", getenv('API_KEY_MAILGUN')),
         data={"from": "HackIO <hackio@rohanverma.net>",
               "to": [to_email],
               "subject": subject,
