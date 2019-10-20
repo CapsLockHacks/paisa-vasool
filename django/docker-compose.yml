@@ -14,7 +14,8 @@ services:
       - redis
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    # command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn upicollect.wsgi:application --bind 0.0.0.0:8000 -w 4
     volumes:
       - .:/code
     env_file:
