@@ -2,6 +2,7 @@ module.exports = {
   'transpileDependencies': [
     'vuetify'
   ],
+  assetsDir: "static",
   devServer: {
     port: 7000,
     proxy: {
