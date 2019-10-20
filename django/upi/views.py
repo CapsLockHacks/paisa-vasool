@@ -118,16 +118,20 @@ class Splits(APIView):
 
     """
     def get(self, request, format=None):
-        subscriptions = Subscription.objects.all()
+        # get all groups
+        groups = Group.objects.all()
         data = []
-        for sub in subscriptions:
-            subscription_id = sub.id
-            created_date = sub.created_date
-            contacts = []
-            for i in sub.get_subs_for_groups():
-                paid, unpaid = get_settlement_status(cycle=i.group.cycle, group=i.group)
-                settlement_status = len(unpaid) == 0
-                contacts.append({"name":i.contact.name, "amount":i.amount, "settled": i in paid})
+        for group in groups:
+            # get subscription data for each
+            subscriptions = Subscription.objects.filter(group=group)
+            for sub in subscriptions:
+                subscription_id = sub.id
+                created_date = sub.created_date
+                contacts = []
+                for i in sub.get_subs_for_groups():
+                    paid, unpaid = get_settlement_status(cycle=i.group.cycle, group=i.group)
+                    settlement_status = len(unpaid) == 0
+                    contacts.append({"name":i.contact.name, "amount":i.amount, "settled": i in paid})
             data.append({
                 "settlement_status":settlement_status,
                 "name":sub.group.name,
@@ -135,6 +139,7 @@ class Splits(APIView):
                 "contacts":contacts
             })
         return Response(status=200, data=data)
+
 
     def post(self, request, format=None):
         data = request.data
