@@ -4,7 +4,7 @@ Click==7.0
 Django==2.2.6
 django-filter==2.2.0
 django-rq==2.1.0
-djangorestframework==3.10.3
+djangorestframework==3.11.2
 docutils==0.15.2
 idna==2.8
 jmespath==0.9.4
